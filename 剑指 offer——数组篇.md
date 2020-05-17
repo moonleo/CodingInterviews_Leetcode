@@ -1,4 +1,13 @@
-## 剑指 offer——数组篇
+---
+layout: post
+title: 剑指 offer——数组篇
+date: 2020-04-05
+categories: 算法
+tags: [算法, 剑指 offer, 数组]
+excerpt_separator: <!--more-->
+---
+
+<!--more-->
 #### 3. 数组中重复的数字
 题意：详见[面试题03. 数组中重复的数字](https://leetcode-cn.com/problems/shu-zu-zhong-zhong-fu-de-shu-zi-lcof/)  
 思路1：使用Hash表。遍历整个数组，在访问到某个数字时，先在Hash表中查询是否已包含此数字，如果包含，返回此数字即可；如果不包含，则将数字加到Hash表中，继续遍历下一个数字。
@@ -199,6 +208,62 @@ class Solution {
             }
         }
         return start;
+    }
+}
+```
+
+#### 39. 数组中出现次数超过一次的数字
+题意：[面试题39. 数组中出现次数超过一半的数字](https://leetcode-cn.com/problems/shu-zu-zhong-chu-xian-ci-shu-chao-guo-yi-ban-de-shu-zi-lcof/)  
+思路：假设数组中超过一半的数字为x，如果同时删除一个x和另一个非x，那么最后数组中剩下的仍然是x.
+遍历数组，使用一个候选值candidate和一个计数count记录当前比较多的数字，如果遍历到的数字等于candidate，那么count加一。
+如果遍历到的数字不为candidate，那么count减一，当count减到0的时候，将candidate赋值为此时遍历到的数字。
+最后candidate记录的数字就是出现次数超过一半的数字。
+```Java
+class Solution {
+    public int majorityElement(int[] nums) {
+        int candidate = nums[0];
+        int count = 1;
+        for (int i = 1; i < nums.length; i ++) {
+            if (nums[i] == candidate) {
+                count ++;
+            } else {
+                if (count == 0) {
+                    candidate = nums[i];
+                } else {
+                    count --;
+                }
+            }
+        }
+        return candidate;
+    }
+}
+```
+
+#### 40. 最小的k个数
+题意：[面试题40. 最小的k个数](https://leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/)  
+思路：使用大根堆。大根堆中结点个数维持在k个。遍历的过程中，如果当前元素比根结点的值小，那么将当前元素插入大根堆中，并将堆顶元素弹出。遍历完之后大根堆中保存的就是最小的k个数。
+Java中大根堆可以使用优先队列来实现。
+```Java
+class Solution {
+    public int[] getLeastNumbers(int[] arr, int k) {
+        PriorityQueue<Integer> queue = new PriorityQueue<>((i1, i2) -> {
+            return i2 - i1;
+        });
+        for (int i : arr) {
+            if (queue.size() >= k) {
+                if (!queue.isEmpty() && i < queue.peek()) {
+                    queue.poll();
+                    queue.add(i);
+                }
+            } else {
+                queue.add(i);
+            }
+        }
+        int[] res = new int[queue.size()];
+        for (int i = 0; i < res.length; i ++) {
+            res[i] = queue.poll();
+        }
+        return res;
     }
 }
 ```

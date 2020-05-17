@@ -1,4 +1,12 @@
-## 剑指 offer——链表、栈与队列篇
+---
+layout: post
+title: 剑指 offer——链表、栈与队列篇
+date: 2020-04-05
+categories: 算法
+tags: [算法, 剑指 offer, 链表, 栈, 队列]
+excerpt_separator: <!--more-->
+---
+<!--more-->
 #### 6. 从尾到头打印链表
 题意：[面试题06. 从尾到头打印链表](https://leetcode-cn.com/problems/cong-wei-dao-tou-da-yin-lian-biao-lcof/)  
 思路：首先遍历一遍链表得到链表的长度，以此长度初始化数组。然后再从头到尾遍历一遍链表，并将遍历得到的数字从后往前插入数组。
@@ -160,6 +168,62 @@ class Solution {
 }
 ```
 
+#### 30. 包含min函数的栈
+题意：[面试题30. 包含min函数的栈](https://leetcode-cn.com/problems/bao-han-minhan-shu-de-zhan-lcof/)  
+思路：使用两个栈，一个栈data用来保存数据，另一个栈min用来存data中最小值的信息。  
+1）入栈时，若当前入栈的元素x小于min栈中栈顶元素，那么将当前元素x同时压入data栈和min栈。  
+2）出栈时，若出栈元素x等于min的栈顶元素，那么将x也从min栈中弹出。
+```Java
+class MinStack {
+    Stack<Integer> data;
+    Stack<Integer> min;
+    /** initialize your data structure here. */
+    public MinStack() {
+        data = new Stack<>();
+        min = new Stack<>();
+    }
+
+    public void push(int x) {
+        data.push(x);
+        if (min.isEmpty() || x <= min.peek()) {
+            min.push(x);
+        }
+    }
+
+    public void pop() {
+        if (data.isEmpty()) {
+            return;   
+        }
+        int num = data.pop();
+        if (num == min.peek()) {
+            min.pop();
+        }
+    }
+
+    public int top() {
+        if (data.isEmpty()) {
+            return -1;
+        }
+        return data.peek();
+    }
+
+    public int min() {
+        if (min.isEmpty()) {
+            return -1;
+        }
+        return min.peek();
+    }
+}
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack obj = new MinStack();
+ * obj.push(x);
+ * obj.pop();
+ * int param_3 = obj.top();
+ * int param_4 = obj.min();
+ */
+```
+
 #### 31. 栈的压入、弹出序列
 题意：[面试题31. 栈的压入、弹出序列](https://leetcode-cn.com/problems/zhan-de-ya-ru-dan-chu-xu-lie-lcof/)  
 思路：建一个栈来模拟题目中的压入、弹出操作。由于弹出序列中的第一个数字，一定是出现在栈顶时弹出的，如
@@ -185,6 +249,61 @@ class Solution {
             pushIndex ++;
         }
         return stack.isEmpty();
+    }
+}
+```
+
+#### 35. 复杂链表的复制
+题意：[面试题35. 复杂链表的复制](https://leetcode-cn.com/problems/fu-za-lian-biao-de-fu-zhi-lcof/)  
+思路：链表除了next指针，还包含random指针。使用一个Map记录下已经创建的新结点，并将旧结点与新结点建立映射关系。在遍历过程中对于已经创建过的结点直接从Map中取即可。
+```Java
+class Solution {
+    Map<Node, Node> map = new HashMap<>();
+
+    public Node copyRandomList(Node head) {
+        if (head == null) {
+            return null;
+        }
+        if (map.get(head) != null) {
+            return map.get(head);
+        }
+        Node newNode = new Node(head.val);
+        map.put(head, newNode);
+        newNode.next = copyRandomList(head.next);
+        newNode.random = copyRandomList(head.random);
+        return newNode;
+    }
+}
+```
+
+#### 41. 数据流中的中位数
+题意：[面试题41. 数据流中的中位数](https://leetcode-cn.com/problems/shu-ju-liu-zhong-de-zhong-wei-shu-lcof/)  
+思路：构造两个堆，一个大根堆，一个小根堆。使大根堆中记录数据流中较小部分的元素，小根堆中记录数据流中较大部分的元素。  
+使得小根堆中元素的值都大于大根堆中元素的值。即使小根堆的根结点值比大根堆的根结点值要大。  
+并且保证，在数据流的个数为偶数时，两个堆中的数据个数一样（此时中位数为两个堆堆顶元素的平均值）。数据流个数为奇数时，大根堆个数比小根堆多一个（此时中位数为大根堆的堆顶元素）。
+```Java
+class MedianFinder {
+    PriorityQueue<Integer> min;
+    PriorityQueue<Integer> max;
+
+    /** initialize your data structure here. */
+    public MedianFinder() {
+        min = new PriorityQueue();
+        max = new PriorityQueue(Collections.reverseOrder());
+    }
+
+    public void addNum(int num) {
+        if (max.size() == min.size()) {
+            min.add(num);
+            max.add(min.poll());
+        } else {
+            max.add(num);
+            min.add(max.poll());
+        }
+    }
+
+    public double findMedian() {
+        return max.size() == min.size() ? (max.peek() + min.peek()) / 2.0 : max.peek();
     }
 }
 ```

@@ -1,5 +1,13 @@
-## 剑指 offer——树与图篇
-### 树
+---
+layout: post
+title: 剑指 offer——树与图篇
+date: 2020-04-05
+categories: 算法
+tags: [算法, 剑指 offer, 树, 二叉树, 图, dfs, bfs]
+excerpt_separator: <!--more-->
+---
+
+<!--more-->
 #### 7. 重建二叉树
 题意：[面试题07. 重建二叉树](https://leetcode-cn.com/problems/zhong-jian-er-cha-shu-lcof/)  
 思路：前序遍历的顺序是“根-左-右”，中序遍历的顺序是“左-中-右”。  
@@ -32,7 +40,6 @@ class Solution {
 }
 ```
 
-### DFS/BFS
 #### 12. 矩阵中的路径
 题意：[面试题12. 矩阵中的路径](https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/)  
 思路：典型的dfs搜索+回溯题，每次朝一个方向进行搜索到底，不满足条件时进行回溯。
@@ -188,6 +195,269 @@ class Solution {
         } else {
             boolean flag = (left.val == right.val);
             return flag && isSame(left.left, right.right) && isSame(left.right, right.left);
+        }
+    }
+}
+```
+
+#### 32-I. 从上到下打印二叉树
+题意：[面试题32 - I. 从上到下打印二叉树](https://leetcode-cn.com/problems/cong-shang-dao-xia-da-yin-er-cha-shu-lcof/)  
+思路：二叉树层次遍历，使用队列即可。
+```Java
+class Solution {
+    public int[] levelOrder(TreeNode root) {
+        List<Integer> list = new ArrayList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        if (root != null) {
+            queue.add(root);
+        }
+        TreeNode tmp;
+        while (!queue.isEmpty()) {
+            tmp = queue.poll();
+            list.add(tmp.val);
+            if (tmp.left != null) {
+                queue.add(tmp.left);
+            }
+            if (tmp.right != null) {
+                queue.add(tmp.right);
+            }
+        }
+        int[] out = new int[list.size()];
+        for (int i = 0 ; i < out.length; i ++) {
+            out[i] = list.get(i);
+        }
+        return out;
+    }
+}
+```
+
+#### 32-II. 从上到下打印二叉树 II
+题意：[面试题32 - II. 从上到下打印二叉树 II](https://leetcode-cn.com/problems/cong-shang-dao-xia-da-yin-er-cha-shu-ii-lcof/)  
+思路：二叉树层次遍历。有两种方式，详见{% post_link "二叉树的遍历" %}
+```Java
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        if (root != null) {
+            queue.add(root);
+        }
+        TreeNode last = root;
+        TreeNode nLast = root;
+        List<Integer> list = new ArrayList<>();
+        TreeNode tmp;
+        while (!queue.isEmpty()) {
+            tmp = queue.poll();
+            list.add(tmp.val);
+            if (tmp.left != null) {
+                queue.add(tmp.left);
+                nLast = tmp.left;
+            }
+            if (tmp.right != null) {
+                queue.add(tmp.right);
+                nLast = tmp.right;
+            }
+            if (tmp == last) {
+                res.add(list);
+                list = new ArrayList<>();
+                last = nLast;
+            }
+        }
+        return res;
+    }
+}
+```
+
+#### 33-III. 从上到下打印二叉树 III
+题意：[面试题32 - III. 从上到下打印二叉树 III](https://leetcode-cn.com/problems/cong-shang-dao-xia-da-yin-er-cha-shu-iii-lcof/)  
+思路：与32题类似，增加一个标志位表示当前打印的是奇数行还是偶数行，奇数行从列表尾部插入元素，偶数行从列表头部插入元素。
+```Java
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null) {
+            return res;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        TreeNode tmp;
+        int size;
+        boolean flag = true;
+        List<Integer> list;
+        while (!queue.isEmpty()) {
+            size = queue.size();
+            list = new ArrayList<>();
+            for (int i = 0; i < size; i ++) {
+                tmp = queue.poll();
+                if (flag) {
+                    list.add(tmp.val);
+                } else {
+                    list.add(0, tmp.val);
+                }
+                if (tmp.left != null) {
+                    queue.add(tmp.left);
+                }
+                if (tmp.right != null) {
+                    queue.add(tmp.right);
+                }
+            }
+            res.add(list);
+            flag = !flag;
+        }
+        return res;
+    }
+}
+```
+
+#### 34. 二叉树中和为某一值的路径
+题意：[面试题34. 二叉树中和为某一值的路径](https://leetcode-cn.com/problems/er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof/)
+思路：最经典的dfs+回溯。dfs遍历过程中，使用列表记录从根结点到当前结点的路径，到达叶子结点时计算是否满足和为指定值，然后进行回溯。
+```Java
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        if (root == null) {
+            return res;
+        }
+        LinkedList<Integer> path = new LinkedList<>();
+        dfs(root, sum, path);
+        return res;
+    }
+
+    private void dfs(TreeNode root, int target, LinkedList<Integer> path) {
+        path.add(root.val);
+        if (root.left == null && root.right == null) {
+            if (target == root.val) {
+                res.add(new ArrayList<>(path));
+            }
+            path.removeLast();
+            return;
+        }
+        if (root.left != null) {
+            dfs(root.left, target - root.val, path);
+        }
+        if (root.right != null) {
+            dfs(root.right, target - root.val, path);
+        }
+        path.removeLast();
+    }
+}
+```
+
+#### 36. 二叉搜索树与双向链表
+题意：[面试题36. 二叉搜索树与双向链表](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-lcof/)
+思路：二叉搜索树的前序遍历结果是一个递增的序列。可以利用这个特点，将遍历到的点依次连接起来。
+```Java
+class Solution {
+    public Node treeToDoublyList(Node root) {
+        inOrder(root);
+        if (p != null) {
+            p.right = head;
+            head.left = p;
+        }
+        return head;
+    }
+
+    Node head;
+    Node p;
+
+    private void inOrder(Node root) {
+        if (root == null) {
+            return;
+        }
+        inOrder(root.left);
+        if (head == null) {
+            head = root;
+            p = head;
+        } else {
+            p.right = root;
+            root.left = p;
+            p = root;
+        }
+        inOrder(root.right);
+    }
+}
+```
+
+#### 37. 序列化二叉树
+题意：[面试题37. 序列化二叉树](https://leetcode-cn.com/problems/xu-lie-hua-er-cha-shu-lcof/)
+思路：序列化过程：将各个结点以特殊符号“\_”隔开，空结点以“#”代替，以层序遍历方式遍历整棵树。反序列化的过程中，以"\_"分隔序列化字串，仍以层序方式将分隔出的字串恢复为树的结点，遇到“#”表示该结点为空。
+```Java
+public class Codec {
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        StringBuilder sb = new StringBuilder();
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        TreeNode tmp;
+        while (!queue.isEmpty()) {
+            tmp = queue.poll();
+            if (tmp == null) {
+                sb.append("#_");
+            } else {
+                sb.append(tmp.val).append("_");
+                queue.add(tmp.left);
+                queue.add(tmp.right);
+            }
+        }
+        String res = sb.toString();
+        return res.substring(0, res.length() - 1);
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        String[] vals = data.split("_");
+        if ("#".equals(vals[0])) {
+            return null;
+        }
+        TreeNode root = new TreeNode(Integer.parseInt(vals[0]));
+        int index = 1;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        TreeNode tmp;
+        while (!queue.isEmpty()) {
+            tmp = queue.poll();
+            if (!"#".equals(tmp)) {
+                if (!vals[index].equals("#")) {
+                    tmp.left = new TreeNode(Integer.parseInt(vals[index]));
+                    queue.add(tmp.left);
+                }
+                index ++;
+                if (!vals[index].equals("#")) {
+                    tmp.right = new TreeNode(Integer.parseInt(vals[index]));
+                    queue.add(tmp.right);
+                }
+                index ++;
+            }
+        }
+        return root;
+    }
+}
+```
+
+#### 46. 把数字翻译成字符串
+题意：[面试题46. 把数字翻译成字符串
+](https://leetcode-cn.com/problems/ba-shu-zi-fan-yi-cheng-zi-fu-chuan-lcof/)
+思路：每次考虑一个字符和两个字符（只有当前位置不是最后一个位置，且两个字符拼接成的整数小于25时才考虑这种情况），然后递归剩下的字符。当到达数字结尾时结束。
+```Java
+class Solution {
+    private int count = 0;
+
+    public int translateNum(int num) {
+        translateNum(String.valueOf(num).toCharArray(), 0);
+        return count;
+    }
+
+    private void translateNum(char[] arr, int start) {
+        if (start >= arr.length) {
+            count ++;
+            return;
+        }
+        translateNum(arr, start + 1);
+        if (start < arr.length - 1 && (arr[start] == '1'
+        || (arr[start] == '2' && arr[start + 1] <= '5'))) {
+            translateNum(arr, start + 2);
         }
     }
 }

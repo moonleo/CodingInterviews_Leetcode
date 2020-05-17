@@ -1,4 +1,14 @@
-## 剑指 offer——位操作篇
+---
+layout: post
+title: 剑指 offer——位操作篇
+date: 2020-04-05
+categories: 算法
+tags: [算法, 剑指 offer, 位操作, bit]
+excerpt_separator: <!--more-->
+mathjax: true
+---
+
+<!--more-->
 #### 15. 二进制中1的个数
 题意：[面试题15. 二进制中1的个数](https://leetcode-cn.com/problems/er-jin-zhi-zhong-1de-ge-shu-lcof/)  
 思路：使用位操作，每次计算给定数字的某一个二进制位上是否为1。由于1的二进制表示中，只有末位为1，其余位均为0，所以将给定的数与1进行按位与操作，即可判断其末位上的二进制位是否为1。

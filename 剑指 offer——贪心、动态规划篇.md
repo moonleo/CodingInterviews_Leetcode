@@ -1,4 +1,14 @@
-## 剑指 offer——贪心、动态规划篇
+---
+layout: post
+title: 剑指 offer——贪心、动态规划篇
+date: 2020-04-05
+categories: 算法
+tags: [算法, 剑指 offer, 贪心算法, 动态规划]
+excerpt_separator: <!--more-->
+mathjax: true
+---
+
+<!--more-->
 #### 10-I. 斐波拉契数列
 题意：[面试题10- I. 斐波那契数列](https://leetcode-cn.com/problems/fei-bo-na-qi-shu-lie-lcof/)  
 思路：最基础的动态规划题。数据量比较大的时候不能使用递归，会报StackOverFlow Exception，最优的方式是迭代计算。
@@ -143,6 +153,76 @@ class Solution {
             }
         }
         return dp[sLen][pLen];
+    }
+}
+```
+
+#### 42. 连续子数组的最大和
+题意：[面试题42. 连续子数组的最大和](https://leetcode-cn.com/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/)
+思路：贪心。状态转移方程式为sum[i] = max(sum[i-1] + nums[i], nums[i])，其中sum[i]表示元素nums[0...i]的和。
+```Java
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int max = Integer.MIN_VALUE;
+        int sum = 0;
+        for (int i = 0; i < nums.length; i ++) {
+            sum = Math.max(sum + nums[i], nums[i]);
+            max = Math.max(max, sum);
+        }
+        return max;
+    }
+}
+```
+
+#### 47. 礼物的最大价值
+题意：[面试题47. 礼物的最大价值](https://leetcode-cn.com/problems/li-wu-de-zui-da-jie-zhi-lcof/)  
+思路：动态规划。递推公式dp[i][j] = max(dp[i-1][j], dp[i][j-1]) + grid[i][j]，优化为一维后，第i行礼物最大价值：dp[j] = max(dp[j-1], dp[j]) + grid[i][j]。
+```Java
+class Solution {
+    public int maxValue(int[][] grid) {
+        int[] dp = new int[grid[0].length];
+        dp[0] = grid[0][0];
+        for (int j = 1; j < dp.length; j ++) {
+            dp[j] = dp[j - 1] + grid[0][j];
+        }
+        for (int i = 1; i < grid.length; i ++) {
+            for (int j = 0; j < grid[0].length; j ++) {
+                if (j == 0) {
+                    dp[j] += grid[i][j];
+                } else {
+                    dp[j] = Math.max(dp[j - 1], dp[j]) + grid[i][j];
+                }
+            }
+        }
+        return dp[grid[0].length - 1];
+    }
+}
+```
+
+#### 49. 丑数
+题意：[面试题49. 丑数](https://leetcode-cn.com/problems/chou-shu-lcof/)  
+思路：动态规划。丑数是2，3，5的倍数，下一个丑数一定是前面某一个数乘以2或3或5得到的最小数字。使用三个指针two、three、five分别指向2、3、5的倍数，下一个更大的数将由这三个指针指向的数字分别乘2、乘3、乘5取最小值得到。取得最小值之后指针向前走一步。
+```Java
+class Solution {
+    public int nthUglyNumber(int n) {
+        int two = 0;
+        int three = 0;
+        int five = 0;
+        int[] dp = new int[n];
+        dp[0] = 1;
+        for (int i = 1; i < n; i ++) {
+            dp[i] = Math.min(Math.min(dp[two] * 2, dp[three] * 3), dp[five] * 5);
+            if (dp[i] == dp[two] * 2) {
+                two ++;
+            }
+            if (dp[i] == dp[three] * 3) {
+                three ++;
+            }
+            if (dp[i] == dp[five] * 5) {
+                five ++;
+            }
+        }
+        return dp[n - 1];
     }
 }
 ```
